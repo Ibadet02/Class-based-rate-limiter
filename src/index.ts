@@ -36,19 +36,40 @@ class RateLimiter {
 
     return true;
   }
+
+  get stats() {
+    return this.#requests.size;
+  }
+
+  clear(userId: string) {
+    const currentUser = this.#requests.get(userId);
+
+    if (!currentUser) {
+      return false;
+    }
+
+    const currentTime = Date.now();
+
+    this.#requests.set(userId, { count: 0, startTime: currentTime });
+  }
 }
 
-const limiter = new RateLimiter(5, 60000);
+const limiter = new RateLimiter(5, 2000);
 
-limiter.check("user_1")
-limiter.check("user_1")
-limiter.check("user_1")
-limiter.check("user_1")
-limiter.check("user_1")
-limiter.check("user_1")
-limiter.check("user_1")
-limiter.check("user_1")
+limiter.check("user_1");
+limiter.check("user_1");
+limiter.check("user_1");
+limiter.check("user_1");
+limiter.check("user_1");
+limiter.check("user_1");
+limiter.check("user_1");
+limiter.check("user_1");
+limiter.clear("user_1");
 limiter.check("user_1")
 
+setTimeout(() => {
+  limiter.check("user_2");
+  limiter.check("user_2");
+}, 3000);
 
-
+console.log(limiter.stats);
